@@ -1,4 +1,3 @@
-
 // collections/Posts.ts
 import {
   MetaDescriptionField,
@@ -21,6 +20,7 @@ import {
   canUpdatePosts,
   canDeletePosts,
 } from "@/lib/AccessControl";
+import { revalidatePost, revalidateDelete } from "./Hooks/hooks";
 
 export const Posts: CollectionConfig = {
   slug: "posts",
@@ -37,6 +37,19 @@ export const Posts: CollectionConfig = {
     update: canUpdatePosts,
     // Only admins can delete
     delete: canDeletePosts,
+  },
+  versions: {
+    drafts: {
+      autosave: {
+        interval: 100, // We set this interval for optimal live preview
+      },
+      schedulePublish: true,
+    },
+    maxPerDoc: 50,
+  },
+  hooks: {
+    afterChange: [revalidatePost],
+    afterDelete: [revalidateDelete],
   },
   fields: [
     {
@@ -67,18 +80,18 @@ export const Posts: CollectionConfig = {
                     if (!value && data?.title) {
                       return data.title
                         .toLowerCase()
-                        .replace(/[^\w\s-]/g, '') // Remove special characters
-                        .replace(/\s+/g, '-') // Replace spaces with hyphens
-                        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+                        .replace(/[^\w\s-]/g, "") // Remove special characters
+                        .replace(/\s+/g, "-") // Replace spaces with hyphens
+                        .replace(/-+/g, "-") // Replace multiple hyphens with single hyphen
                         .trim();
                     }
                     // Clean up manually entered slug
                     if (value) {
                       return value
                         .toLowerCase()
-                        .replace(/[^\w\s-]/g, '')
-                        .replace(/\s+/g, '-')
-                        .replace(/-+/g, '-')
+                        .replace(/[^\w\s-]/g, "")
+                        .replace(/\s+/g, "-")
+                        .replace(/-+/g, "-")
                         .trim();
                     }
                     return value;
@@ -118,7 +131,7 @@ export const Posts: CollectionConfig = {
               admin: {
                 condition: (data, siblingData, { user }) => {
                   // Hide field for non-admins (auto-set on create)
-                  return user?.roles?.includes("admin");
+                  return !!user?.roles?.includes("admin");
                 },
               },
               // Auto-set author to current user on create

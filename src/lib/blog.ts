@@ -16,11 +16,12 @@ export const getPosts = unstable_cache(
   async (): Promise<Post[]> => {
     const payload = await getPayloadClient();
 
-    const result = await payload.find({
+    const result = await payload.db.find({
       collection: "posts",
-      depth: 2,
       sort: "-createdAt",
     });
+
+
 
     return result.docs as unknown as Post[];
   },
@@ -30,6 +31,11 @@ export const getPosts = unstable_cache(
     tags: ["posts"],
   }
 );
+
+
+
+
+
 
 export function extractPlainText(node: any): string {
   if (!node) return "";

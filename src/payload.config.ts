@@ -7,10 +7,10 @@ import { fileURLToPath } from "url";
 import sharp from "sharp";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 
-import { Users } from "./collections/Users";
-import { Media } from "./collections/Media";
-import { Posts } from "./collections/Posts";
-import { Category } from "./collections/Category";
+import { Users } from "./collections/Users/Users";
+import { Media } from "./collections/Media/Media";
+import { Posts } from "./collections/Posts/Posts";
+import { Category } from "./collections/Category/Category";
 
 
 const filename = fileURLToPath(import.meta.url);

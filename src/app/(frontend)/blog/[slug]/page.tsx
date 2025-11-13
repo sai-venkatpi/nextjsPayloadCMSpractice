@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Calendar, Tag, User } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -14,12 +20,15 @@ import {
   getAuthorEmail,
   BLOG_REVALIDATE,
 } from "@/lib/blog";
+import { RichText } from "@payloadcms/richtext-lexical/react";
 
 export const revalidate = BLOG_REVALIDATE;
 
 export async function generateStaticParams() {
   const posts = await getPosts();
-  return posts.filter((post) => Boolean(post.slug)).map((post) => ({ slug: post.slug }));
+  return posts
+    .filter((post) => Boolean(post.slug))
+    .map((post) => ({ slug: post.slug }));
 }
 
 type PageProps = {
@@ -31,12 +40,13 @@ type PageProps = {
 export default async function PostPage({ params }: PageProps) {
   const posts = await getPosts();
   const currentPost = posts.find((post) => post.slug === params.slug);
-
   if (!currentPost) {
     notFound();
   }
 
-  const relatedPosts = posts.filter((post) => post.id !== currentPost.id).slice(0, 3);
+  const relatedPosts = posts
+    .filter((post) => post.id !== currentPost.id)
+    .slice(0, 3);
 
   return (
     <div className="container py-12 max-w-4xl mx-auto ">
@@ -73,12 +83,6 @@ export default async function PostPage({ params }: PageProps) {
           <h1 className="text-4xl font-bold tracking-tight">
             {currentPost.title}
           </h1>
-
-          {getExcerpt(currentPost) && (
-            <p className="text-xl text-muted-foreground">
-              {getExcerpt(currentPost)}
-            </p>
-          )}
         </div>
 
         <Separator />
@@ -86,8 +90,8 @@ export default async function PostPage({ params }: PageProps) {
         <Alert>
           <AlertDescription>
             This route is statically generated and revalidated every{" "}
-            {BLOG_REVALIDATE} seconds. To invalidate the cache immediately
-            after publishing, trigger the Payload revalidate hook for the{" "}
+            {BLOG_REVALIDATE} seconds. To invalidate the cache immediately after
+            publishing, trigger the Payload revalidate hook for the{" "}
             <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
               posts
             </code>{" "}
@@ -98,9 +102,7 @@ export default async function PostPage({ params }: PageProps) {
         <Card>
           <CardContent className="pt-6">
             <div className="prose prose-gray dark:prose-invert max-w-none">
-              <p className="text-muted-foreground">
-                [Integrate your Payload rich text renderer here to display the full content]
-              </p>
+              {currentPost?.content && <RichText data={currentPost?.content} />}
             </div>
           </CardContent>
         </Card>
@@ -116,7 +118,10 @@ export default async function PostPage({ params }: PageProps) {
                 <Card key={post.id}>
                   <CardHeader>
                     <CardTitle className="line-clamp-2 text-lg">
-                      <Link href={`/blog/${post.slug}`} className="hover:underline">
+                      <Link
+                        href={`/blog/${post.slug}`}
+                        className="hover:underline"
+                      >
                         {post.title}
                       </Link>
                     </CardTitle>
